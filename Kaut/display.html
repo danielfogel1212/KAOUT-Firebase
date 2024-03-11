@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Form</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #007bff;
+    }
+
+    .signup-box {
+      max-width: 400px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div class="col-md-6">
+
+        <div class="signup-box" id="createGameBox">
+          <h2>הרשם למשחק</h2>
+      
+            <div class="form-group">
+              <label for="createUsername">שם משתמש:</label>
+              <input type="text" id="email" name="createUsername" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="createPassword">סיסמא:</label>
+              <input type="password" id="password" name="createPassword" class="form-control" required>
+            </div>
+
+            <button  id="registerUser" class="btn btn-primary">הרשמה</button>
+                                       
+            <a href="login.html">עמוד כניסה</a>
+        
+        </div>
+<!-- 
+        <div class="signup-box" id="joinGameBox">
+          <h2>הרשם למשחק חדש</h2>
+        
+            <div class="form-group">
+              <label for="joinUsername">שם משתמש:</label>
+              <input type="text" id="name1" name="joinUsername" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="joinPassword">סיסמא:</label>
+              <input type="password" id="password1" name="joinPassword" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="joinPassword">קוד משחק</label>
+                <input type="password" id="gameId" name="joinPassword" class="form-control" required>
+              </div>
+            <button id="login-button" class="btn btn-primary">הרשמה</button>
+        
+        </div> -->
+
+      </div>
+    </div>
+  </div>
+
+     <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+import { getFirestore, where, collection, addDoc, getDoc, query, serverTimestamp ,limitToLast, orderBy, limit, startAfter, startAt, endAt, onSnapshot, doc, getDocs, deleteField, updateDoc, deleteDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword , onAuthStateChanged,signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+  authDomain: "todos-e7e2f.firebaseapp.com",
+  databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+  projectId: "todos-e7e2f",
+  storageBucket: "todos-e7e2f.appspot.com",
+  messagingSenderId: "523425205783",
+  appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
+
+
+
+
+      const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Get references to elements
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    // Get reference to the authentication service
+    const registerUserButton = document.getElementById("registerUser");
+    registerUserButton.addEventListener("click", registerUser);
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+   
+    const uid = user.uid;
+    const name= user.email
+ 
+    // ...
+  } else {
+    // User is signed out
+    // ...
+  }
+});
+    function registerUser() {
+      let email = emailInput.value;
+      const password = passwordInput.value;
+      email+="@gmail.com"
+      // Create user with email and password
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // User registered successfully
+          const user = userCredential.user;
+          console.log('User registered:', user);
+             window.location.href="admin.html"
+        })
+        .catch((error) => {
+          // Handle errors during registration
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.error(`Registration failed: ${errorCode} - ${errorMessage}`);
+        });
+    }
+    let add = document.getElementById("login-button")
+        add.addEventListener("click",  notNow);
+function notNow(){
+  
+            
+            var password1 = document.getElementById("password1").value;
+            let email1 = document.getElementById("name1").value;
+            var gameId1 = document.getElementById("gameId").value;
+ email1+="@gmail.com"
+            createUserWithEmailAndPassword(auth, email1, password1)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    console.log("User signed in:", user);
+                    
+                    location.href = "index.html?gameId="+ gameId1;
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.error("Error signing in:", errorCode, errorMessage);
+                    // Handle the error (e.g., display an error message to the user)
+                });
+            }
+  </script>
+</body>
+</html>

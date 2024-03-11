@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <div id="login" style="direction: rtl; text-align: right;">
+        <div class="container">
+            <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+                        <form id="login-form" class="form" action="" method="post" style="margin-top: 100px;">
+                            <h3 class="text-center text-info">התחברות</h3>
+                            <div class="form-group">
+                                <label for="username" class="text-info">שם משתמש</label><br>
+                                <input type="text" name="username" id="username" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="text-info"></label><br>
+                                <input type="password" name="password" id="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="remember-me" class="text-info"><span>זכור אותי</span> <span><input id="remember-me" name="remember-me" type="checkbox"></span></label><br>
+                                <button type="button" id="login-button" name="login-button" class="btn btn-info btn-md">שלח</button>
+                                <br><br>
+                                
+                                <a href="display.html">עמוד הרשמה</a>
+                            </div>
+                            <div id="register-link" class="text-right"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js';
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+  authDomain: "todos-e7e2f.firebaseapp.com",
+  databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+  projectId: "todos-e7e2f",
+  storageBucket: "todos-e7e2f.appspot.com",
+  messagingSenderId: "523425205783",
+  appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let add = document.getElementById("login-button")
+        add.addEventListener("click",  notNow);
+function notNow(){
+  
+            var email = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            email=email+"@gmail.com"
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    console.log("User signed in:", user);
+                    location.href = "admin.html";
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.error("Error signing in:", errorCode, errorMessage);
+                    // Handle the error (e.g., display an error message to the user)
+                });
+            }
+        
+    </script>
+</body>
+</html>

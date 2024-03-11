@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highest Scorer</title>
+</head>
+<body>
+    <center>
+        <h1>המנצח של המשחק הוא</h1>
+        <div id="winner"></div>
+    </center>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js';
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+            authDomain: "todos-e7e2f.firebaseapp.com",
+            databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+            projectId: "todos-e7e2f",
+            storageBucket: "todos-e7e2f.appspot.com",
+            messagingSenderId: "523425205783",
+            appId: "1:523425205783:web:6fd93bb6f354c361541652"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function getHighestScorer() {
+            try {
+                // Create a query to order the documents by score in descending order and limit to 1
+                const q = query(collection(db, "score"), orderBy("score", "desc"), limit(1));
+
+                // Execute the query
+                const querySnapshot = await getDocs(q);
+
+                // Check if any documents match the query
+                if (!querySnapshot.empty) {
+                    // Get the first document (highest scorer)
+                    const highestScorer = querySnapshot.docs[0].data();
+                    console.log("Highest Scorer:", highestScorer.user, "with score:", highestScorer.score);
+                    
+                 document.getElementById('winner').innerHTML=` ${highestScorer.user.split('@')[0]}`
+                } else {
+                    console.log("No scores found.");
+                }
+            } catch (error) {
+                console.error("Error getting highest scorer:", error.message);
+            }
+        }
+
+        // Call the function to get the highest scorer
+        getHighestScorer();
+    </script>
+</body>
+</html>

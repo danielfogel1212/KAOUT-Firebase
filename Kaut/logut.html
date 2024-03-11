@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script type="module">
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+import { getFirestore, where, collection, addDoc,serverTimestamp, getDoc, query, limitToLast, orderBy, limit, startAfter, startAt, endAt, onSnapshot, doc, getDocs, deleteField, updateDoc, deleteDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+  authDomain: "todos-e7e2f.firebaseapp.com",
+  databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+  projectId: "todos-e7e2f",
+  storageBucket: "todos-e7e2f.appspot.com",
+  messagingSenderId: "523425205783",
+  appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Sign out the user
+signOut(auth)
+  .then(() => {
+    // Successful sign-out, redirect to index.html
+    location.href = "index.html";
+  })
+  .catch((error) => {
+    // An error occurred during sign-out
+    console.error("Error signing out:", error);
+
+    // You may want to handle the error in a way that makes sense for your application
+    // For example, you could display an error message to the user or log the error
+  });
+
+    </script>
+</body>
+</html>

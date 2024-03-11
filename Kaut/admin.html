@@ -1,0 +1,397 @@
+
+    
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #kup {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            background-color: #4caf50;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">שאלון</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="admin.html">בית</a></li>
+            <li ><a id="username" href="#"></a></li>
+            <li><a href="logut.html">התנתק</a></li>
+          
+        </ul>
+    </div>
+</nav>
+
+
+<div id="kup">
+  <div class="form-group">
+    <h1>הצטרף למשחק</h1>
+    <label for="joinPassword">קוד משחק</label>
+    <input type="password" id="gameId123"  name="joinPassword" class="form-control" required>
+  </div>
+  <button  id="gameId12" class="btn btn-primary">הצטרף למשחק</button>
+    <h1>ניהול שאלות</h1>
+    <label>רשום את השאלה</label>
+    <input type="text" id="mainQ">
+    <label>רשום תשובה ראשונה</label>
+    <input type="text" id="q1">
+    <label>רשום תשובה שניה</label>
+    <input type="text" id="q2">
+    <label>רשום תשובה שלישית</label>
+    <input type="text" id="q3">
+    <label>רשום תשובה רביעית</label>
+    <input type="text" id="q4">
+    <label>הוסף תשובה נכונה</label>
+    <select id="r">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+    </select>
+    <button id="addQ">הוסף שאלה</button>
+    <br>
+    <br>
+    <button id="start">התחל משחק</button>
+    <br>
+    <br>
+    <button id="move"> עבור לשאלה הבאה</button>
+    <br>
+    <br>
+    <button id="reset">איפוס משחק</button>
+    <br>
+    <br>
+    <button id="delete">מחיקה</button>
+    <br><br>
+    <button id="logut">יציאה</button>
+    <p>שתף קוד משחק</p>
+    <p id="gameId"></p>
+</div>
+
+  <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+import { getFirestore, where, collection, addDoc,serverTimestamp, getDoc, query, limitToLast, orderBy, limit, startAfter, startAt, endAt, onSnapshot, doc, getDocs, deleteField, updateDoc, deleteDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+authDomain: "todos-e7e2f.firebaseapp.com",
+databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+projectId: "todos-e7e2f",
+storageBucket: "todos-e7e2f.appspot.com",
+messagingSenderId: "523425205783",
+appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
+
+         // Your Firebase import statements go here
+         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+    let uid=''
+      let currentIndex = 0; // Track the current question index
+      let questions; // Variable to store the questions
+      onAuthStateChanged(auth, (user) => {
+  if (user) {
+uid = user.uid;
+    const name= user.email
+
+    document.getElementById("username").innerHTML= name.split('@')[0] 
+  createDoc()
+   // ...
+  } else {
+    window.location.href="display.html"
+    // ...
+  }
+});
+async function createDoc(){
+   
+    console.log(uid)
+ document.getElementById("gameId").innerHTML= `<a href="whatsapp://send?text=${uid}">${uid}</a>`
+    const documentData = {
+  uid: uid,
+  mainQ:"חכה לתחילת המשחק",
+  q1:"",
+  q2:"",
+  q3:"",
+  q4:""
+
+ 
+};
+
+// Create a reference to the document with the chosen ID
+const documentRef = doc(db, 'showQ',uid);
+
+// Add the document to the specified collection with the chosen ID
+setDoc(documentRef, documentData)
+  .then(() => {
+    console.log(`Document with ID ${documentId} successfully created in your_collection`);
+  })
+  .catch((error) => {
+    console.error('Error creating document: ', error);
+  });
+
+}
+
+function exit(){
+  window.location.href="logut.html"
+
+}
+      async function delete2(){
+        const collectionRef = collection(db, "q"); // Replace with the actual collection name
+
+try {
+    const querySnapshot = await getDocs(collectionRef);
+
+    // Delete each document in the collection
+    querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+    });
+    
+
+    console.log("All documents in the collection successfully deleted!");
+
+} catch (error) {
+    console.error("Error deleting documents in the collection:", error.message);
+}
+
+      }
+      
+      async function delete1(){
+        const collectionRef = collection(db, "score"); // Replace with the actual collection name
+
+try {
+    // const querySnapshot = await getDocs(collectionRef);
+    const querySnapshot = await getDocs(query(collection(db, "score"), where("ids", "==", uid)))
+    // Delete each document in the collection
+    querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+    });
+    
+
+    console.log("All documents in the collection successfully deleted!");
+} catch (error) {
+    console.error("Error deleting documents in the collection:", error.message);
+}
+
+      }
+      async function start() {
+        
+        const querySnapshot = await getDocs(query(collection(db, "q"), where("ui", "==", uid)))
+          questions = querySnapshot.docs.map(doc => doc.data());
+
+          updateDisplayWithCurrentQuestion();
+          updateFirestoreWithCurrentQuestion();
+          console.log("Initial display set");
+
+          console.log("Updates completed");
+      }
+let remove = document.getElementById("delete");
+      remove.addEventListener("click", delete1);
+      let exit1 = document.getElementById("logut");
+      exit1.addEventListener("click", exit);
+
+      let add = document.getElementById("addQ");
+      add.addEventListener("click", addQ);
+
+      let startButton = document.getElementById("start");
+      startButton.addEventListener("click", start);
+
+      let moveButton = document.getElementById("move");
+      moveButton.addEventListener("click", moveNext);
+
+      
+      let join = document.getElementById("gameId12");
+      join.addEventListener("click", joinGame);
+
+      function joinGame(){
+        let gameId12=document.getElementById("gameId123").value
+        location.href = "index.html?gameId="+ gameId12;
+
+      }
+      function moveNext() {
+          currentIndex = (currentIndex + 1)  // Move to the next question, cyclically
+          updateDisplayWithCurrentQuestion();
+          updateFirestoreWithCurrentQuestion();
+      }
+      function updateDisplayWithCurrentQuestion() {
+    const question = questions[currentIndex];
+
+    if (question && question.mainQ !== undefined) {
+        console.log(question.mainQ);
+        // Update the display with the current question details
+        document.getElementById("mainQ").value = question.mainQ;
+        document.getElementById("q1").value = question.q1;
+        document.getElementById("q2").value = question.q2;
+        document.getElementById("q3").value = question.q3;
+        document.getElementById("q4").value = question.q4;
+        document.getElementById("r").value = question.r;
+    } else {
+  gameOver()        // Optionally, you may want to reset the display or perform other actions after the game is over.
+    }
+}
+      async function updateFirestoreWithCurrentQuestion() {
+          const currentQuestion = questions[currentIndex];
+
+          const updateTask = doc(db, "showQ", uid);
+
+          await updateDoc(updateTask, {
+              mainQ: currentQuestion.mainQ,
+              q1: currentQuestion.q1,
+              q2: currentQuestion.q2,
+              q3: currentQuestion.q3,
+              q4: currentQuestion.q4,
+              r: currentQuestion.r,
+          });
+
+          console.log("Firestore updated with current question");
+      }
+
+   async function addQ() {
+  let mainQ = document.getElementById("mainQ").value;
+  let q1 = document.getElementById("q1").value;
+  let q2 = document.getElementById("q2").value;
+  let q3 = document.getElementById("q3").value;
+  let q4 = document.getElementById("q4").value;
+  let r = document.getElementById("r").value;
+
+  try {
+    // Add a new document to the "q" collection
+    const docRef = await addDoc(collection(db, "q"), {
+      mainQ: mainQ,
+      q1: q1,
+      q2: q2,
+      q3: q3,
+      q4: q4,
+      r: r,
+      ui:uid
+
+    });
+
+    // Log the ID of the newly added document
+    console.log("Question added successfully:", docRef.id);
+
+    // Clear the input fields
+    document.getElementById("mainQ").value = "";
+    document.getElementById("q1").value = "";
+    document.getElementById("q2").value = "";
+    document.getElementById("q3").value = "";
+    document.getElementById("q4").value = "";
+    document.getElementById("r").value = "";
+
+  } catch (error) {
+    console.error("Error adding question:", error.message);
+  }
+}
+      async function gameOver(){
+        document.getElementById("mainQ").value =""
+          document.getElementById("q1").value = ""
+          document.getElementById("q2").value = ""
+          document.getElementById("q3").value = ""
+          document.getElementById("q4").value = ""
+          document.getElementById("r").value = ""
+        const updateTask = doc(db, "showQ", uid);
+
+await updateDoc(updateTask, {
+  mainQ: "<a href='winner.html'>כנסו לכאן כדי לראות מי המנצח</a>",
+  q1: "",
+  q2: "",
+  q3: "",
+  q4: "",
+  r: "",
+});
+
+location.reload()
+      }
+
+      async function reset(){
+        document.getElementById("mainQ").value =""
+          document.getElementById("q1").value = ""
+          document.getElementById("q2").value = ""
+          document.getElementById("q3").value = ""
+          document.getElementById("q4").value = ""
+          document.getElementById("r").value = ""
+        const updateTask = doc(db, "showQ", uid);
+
+await updateDoc(updateTask, {
+  mainQ: "חכו לתחילת המשחק",
+  q1: "",
+  q2: "",
+  q3: "",
+  q4: "",
+  r: "",
+});
+
+location.reload()
+      }
+      let add1 = document.getElementById("reset");
+      add1.addEventListener("click", reset);
+      
+      </script>
+      
+</body>
+</html>

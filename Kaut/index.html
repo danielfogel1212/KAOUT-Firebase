@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #kup {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #q1 {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        #q2 {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        #q3 {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        #q4 {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        #score {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        .user {
+      background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+    }
+    .user .email {
+      font-weight: bold;
+    }
+    </style>
+</head>
+<body>
+    <center>
+     
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="#">שאלון</a>
+      </div>
+      <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li ><a id="username" href="#"></a></li>
+          <li><a href="logut.html">התנתק</a></li>
+          <li><a href="register.html">Page 3</a></li>
+      </ul>
+  </div>
+</nav>
+
+             <br><br>
+      <div id="usersList">
+    <!-- Example user ewinnerlements -->
+   
+    <!--<div class="user">-->
+    <!--  <span class="email">user2@example.com</span>-->
+    <!--</div>-->
+    <!--<div class="user">-->
+    <!--  <span class="email">user3@example.com</span>-->
+    <!--</div>-->
+    <!-- Add more user elements as needed -->
+  </div>
+        <br><br><br>
+        <div id="kup">
+            
+         
+         
+        </div>
+       
+        <div id="score"></div>
+    </center>
+
+    <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+import { getFirestore, where, collection, addDoc, getDoc, query, serverTimestamp ,limitToLast, orderBy, limit, startAfter, startAt, endAt, onSnapshot, doc, getDocs, deleteField, updateDoc, deleteDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+import { getDatabase, ref, set, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+  authDomain: "todos-e7e2f.firebaseapp.com",
+  databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+  projectId: "todos-e7e2f",
+  storageBucket: "todos-e7e2f.appspot.com",
+  messagingSenderId: "523425205783",
+  appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
+
+
+
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+     
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+   
+    const uid = user.uid;
+    const name= user.email
+    document.getElementById("username").innerHTML= name.split('@')[0]
+    addS(name,0)
+
+    document.getElementById('usersList').innerHTML=name
+    // ...
+  } else {
+    window.location.href="display.html"
+    // ...
+  }
+});
+let qm = 1
+let counter =1;
+let choose
+let an = ''
+var id=''
+var extractedId = ''
+ // Initialize 'an' outside the loop
+ function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+function getIdFromUrl(url) {
+  const urlObject = new URL(url);
+  const urlParams = new URLSearchParams(urlObject.search);
+  const id = urlParams.get('gameId');
+  return id;
+}
+
+// Example usage
+const currentUrl = window.location.href;
+console.log(currentUrl);
+
+extractedId = getIdFromUrl(currentUrl);
+console.log(extractedId);
+if(extractedId==null){
+  window.location.href="display.html"
+}
+
+const kup = document.getElementById('kup');
+
+// Firestore Query
+const query1 = query(collection(db, "showQ"), where("uid", "==", extractedId));
+
+var score = 0;
+
+// Snapshot Listener
+
+const unsubscribe = onSnapshot(query1, (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        let data = doc.data();
+
+      
+          kup.innerHTML=''
+        kup.innerHTML += `<h2 id="mainQ">${data.mainQ}</h2>
+            <button id="q1" value="1" class="btn btn-primary">${data.q1}</button>
+            <button id="q2" value="2" class="btn btn-success">${data.q2}</button>
+            <button id="q3" value="3" class="btn btn-danger">${data.q3}</button>
+            <button id="q4" value="4" class="btn btn-warning">${data.q4}</button>`;
+
+        // Event Listeners
+        const buttons = document.querySelectorAll('button[id^="q"]');
+        buttons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const choose = this.value;
+                if (choose === data.r) {
+                    alert("כל הכבוד! ענית על השאלה נכונה");
+                    score = score + 1;
+                    // document.getElementById("score").innerHTML =
+                    //     "התוצאה שלך היא " + score;
+                        upS(score)
+                        
+                }
+
+                // Disable all buttons after one is clicked
+                buttons.forEach((btn) => {
+                    btn.disabled = true;
+                    btn.style.opacity=0.5
+                });
+                
+  
+            });
+        });
+  
+    });
+
+
+});
+
+
+
+async function addS(name, score) {
+  try {
+    // Create a query to check if the document with the specified user exists
+    const querySnapshot = await getDocs(query(collection(db, "score"),where("user", "==", name),where("ids", "==", extractedId)));
+
+    // Check if any documents match the query
+    if (!querySnapshot.empty) {
+      // Document with the specified user already exists, handle accordingly
+      console.log("Document already exists for user:", name);
+      // Loop through documents in the snapshot and log their IDs
+      querySnapshot.forEach((doc) => {
+        console.log("Existing Document ID:", doc.id);
+         id= doc.id
+      });
+    } else {
+        
+      // Document does not exist, add a new one
+      const newDocRef = await addDoc(collection(db, "score"), {
+        user: name,
+        score,
+        ids:extractedId
+      });
+      const updateTimestamp = await updateDoc(newDocRef, {
+        timestamp: serverTimestamp(),
+      });
+
+      // Log the ID of the newly added document
+      console.log("Question added successfully. Document ID:", newDocRef.id);
+      id= newDocRef.id
+    }
+  } catch (error) {
+    console.error("Error adding question:", error.message);
+  }
+}
+
+
+async function upS(score){
+  
+    const updateTask = doc(db, "score", id);
+    
+       await updateDoc(updateTask, {
+    
+  score:score
+});
+   
+
+}
+
+// Array to store existing users
+
+
+const uniqueUsers = new Set();
+
+function getAllUsersAndScores() {
+  try {
+    const kup1 = document.getElementById('usersList');
+    
+    const query1 = query(collection(db, "score"),where("ids", "==", extractedId));
+    const unsubscribe = onSnapshot(query1, (querySnapshot) => {
+      // Clear the uniqueUsers set when a new snapshot is received
+      uniqueUsers.clear();
+      kup1.innerHTML = ''; // Clear the HTML content
+
+      querySnapshot.forEach((doc) => {
+        // Access individual document data
+        const data = doc.data();
+
+        // Assuming your document structure has fields like 'user' and 'score'
+        const user = data.user;
+        const score = data.score;
+
+        // Check if the user is unique before adding to the HTML
+        if (!uniqueUsers.has(user)) {
+          uniqueUsers.add(user);
+          
+          // Update the content of the usersList div
+          kup1.innerHTML += `<div class="user">
+            <span class="email">${user.split('@')[0]}</span> --- ${score}
+          </div>`;
+          
+          // Log or use the data as needed
+          console.log(`User: ${user}, Score: ${score}`);
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error('Error getting users and scores: ', error);
+  }
+}
+
+// Call the function to fetch all users and scores
+getAllUsersAndScores();
+
+
+// Example usage
+
+// Call the function to fetch all users and scores
+</script>
+</body>
+</html>
